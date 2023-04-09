@@ -56,9 +56,9 @@ homework1 cfg = do
         [ good "Deadline: 5000; TxValidRange (6000, 7000)" $ testBeneficiary2 5000 (-999) 1 1
         , good "Deadline: 4999; TxValidRange (5000, 6000)" $ testBeneficiary2 4999 (-999) 1 0
         , bad  "Deadline: 6000; TxValidRange (5000, 5999)" $ testBeneficiary2 6000 (-999) 0 0
-        , bad  "Deadline: 5000; TxValidRange (5000, 6000)" $ testBeneficiary2 5000 (-999) 1 0
-        , bad  "Deadline: 5000; TxValidRange (5001, 6000)" $ testBeneficiary2 5000 (-998) 1 0
-        , bad  "Deadline: 5000; TxValidRange (5999, 6000)" $ testBeneficiary2 5000 0 1 0
+        , bad  "Deadline: 5000; TxValidRange (4000, 5000)" $ testHomework2 5000 (-1999) (-999) 0
+        , bad  "Deadline: 5000; TxValidRange (4999, 5000)" $ testHomework2 5000 (-1000) (-999) 0
+        , bad  "Deadline: 5000; TxValidRange (4999, 5999)" $ testHomework2 5000 (-1000) 0 0
         ]
     , bad "None signing" $ testNoSigning 5000 0 0 0
     ]

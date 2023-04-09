@@ -8,19 +8,35 @@
 module Homework2 where
 
 import           Plutus.V2.Ledger.Api (BuiltinData, POSIXTime, PubKeyHash,
-                                       ScriptContext, Validator,
-                                       mkValidatorScript)
+                                       ScriptContext, Validator, TxInfo (txInfoValidRange),
+                                       mkValidatorScript, scriptContextTxInfo)
 import           PlutusTx             (applyCode, compile, liftCode)
-import           PlutusTx.Prelude     (Bool (False), (.))
+import           PlutusTx.Prelude     (Bool, (.), (&&), ($), traceIfFalse)
 import           Utilities            (wrapValidator)
+import           Plutus.V2.Ledger.Contexts (txSignedBy)
+import           Plutus.V1.Ledger.Interval (contains, from)
 
 ---------------------------------------------------------------------------------------------------
 ----------------------------------- ON-CHAIN / VALIDATOR ------------------------------------------
 
 {-# INLINABLE mkParameterizedVestingValidator #-}
--- This should validate if the transaction has a signature from the parameterized beneficiary and the deadline has passed.
+-- This should validate if the transaction has a signature from the parameterized beneficiary and 
+-- the deadline has passed.
 mkParameterizedVestingValidator :: PubKeyHash -> POSIXTime -> () -> ScriptContext -> Bool
-mkParameterizedVestingValidator _beneficiary _deadline () _ctx = False -- FIX ME!
+mkParameterizedVestingValidator beneficiary deadline () ctx = 
+    txSignedByBeneficiary && txDeadlinePassed
+
+    where
+        info :: TxInfo
+        info = scriptContextTxInfo ctx
+
+        txSignedByBeneficiary :: Bool
+        txSignedByBeneficiary = 
+            traceIfFalse "Transaction not signed!" $ txSignedBy info beneficiary
+        
+        txDeadlinePassed :: Bool
+        txDeadlinePassed = 
+            traceIfFalse "Deadline not passed" $ contains (from deadline) (txInfoValidRange info)
 
 {-# INLINABLE  mkWrappedParameterizedVestingValidator #-}
 mkWrappedParameterizedVestingValidator :: PubKeyHash -> BuiltinData -> BuiltinData -> BuiltinData -> ()
