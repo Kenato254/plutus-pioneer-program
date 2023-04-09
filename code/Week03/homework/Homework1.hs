@@ -11,7 +11,7 @@ import           Plutus.V2.Ledger.Api (BuiltinData, POSIXTime, PubKeyHash,
                                        ScriptContext, Validator, TxInfo (txInfoValidRange),
                                        scriptContextTxInfo, mkValidatorScript)
 import           PlutusTx             (compile, unstableMakeIsData)
-import           PlutusTx.Prelude     (Bool (..), (&&), (||), ($), traceIfFalse)
+import           PlutusTx.Prelude     (Bool (..), (&&), (||), ($), (+), traceIfFalse)
 import           Utilities            (wrapValidator)
 import           Plutus.V2.Ledger.Contexts (txSignedBy)
 import           Plutus.V1.Ledger.Interval  (contains, to, from)
@@ -50,7 +50,7 @@ mkVestingValidator dat () ctx =
         txSignedbyBeneficiary2 = 
             (txSignedBy info $ beneficiary2 dat)
             &&
-            (contains (from $ deadline dat) (txInfoValidRange info))
+            (contains (from $ (1 + deadline dat)) (txInfoValidRange info))
 
 
 
